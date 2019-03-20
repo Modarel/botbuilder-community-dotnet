@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Integration.AspNet.Core;
 using Microsoft.Bot.Configuration;
 using Microsoft.Bot.Connector.Authentication;
@@ -38,6 +39,13 @@ namespace BestMatchMiddleware_Sample
 
         public void ConfigureServices(IServiceCollection services)
         {
+            IStorage dataStore = new MemoryStorage();
+            var conversationState = new ConversationState(dataStore);
+
+            services.AddSingleton(dataStore);
+            services.AddSingleton(conversationState);
+            services.AddSingleton(new BotStateSet(conversationState));
+
             services.AddBot<BestMatchMiddlewareSampleBot>(options =>
             {
                 var secretKey = Configuration.GetSection("botFileSecret")?.Value;
@@ -55,10 +63,7 @@ namespace BestMatchMiddleware_Sample
 
                 options.CredentialProvider = new SimpleCredentialProvider(endpointService.AppId, endpointService.AppPassword);
 
-                // add our new CommonResponsesMiddleware class which inherits from
-                // BestMatchMiddleware.  All incoming requests to the bot will
-                // go through the middleware which will respond if a match is found
-                options.Middleware.Add(new CommonResponsesMiddleware());
+                options.Middleware.Add(new AutoSaveStateMiddleware(conversationState));
 
                 ILogger logger = _loggerFactory.CreateLogger<BestMatchMiddlewareSampleBot>();
                 options.OnTurnError = async (context, exception) =>
