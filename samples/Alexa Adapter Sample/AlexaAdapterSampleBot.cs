@@ -45,10 +45,12 @@ namespace AlexaAdapter_Sample
 
                     break;
                 case AlexaRequestTypes.LaunchRequest:
-                    var responseMessage = $"You launched the Alexa Bot Sample!";
+                    var responseMessage = $"Hello, how can I help you?!";
                     await turnContext.SendActivityAsync(responseMessage);
                     break;
             }
         }
+
+
     }
 }

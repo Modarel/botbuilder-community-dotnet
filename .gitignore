@@ -6,6 +6,9 @@
 =======
 >>>>>>> adc0f559ad838ead705dbdd88fcbfae8980f2662
 
+appsettings.json
+BotConfiguration.bot
+
 # User-specific files
 *.suo
 *.user
